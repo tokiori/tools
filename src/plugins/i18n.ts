@@ -20,9 +20,10 @@ type LocaleSelector = {
   data: ToLocales;
 }
 export const loadedLocales:LocaleSelector[] = [
-  {id:"ja", data:ja, title:"日本語"},
-  {id:"en", data:en, title:"English"},
+  {id:"ja-JP", data:ja, title:"日本語"},
+  {id:"en-US", data:en, title:"English"},
 ]
+// lang: "ja-JP"|"en-US"|"en-GB"|"zh-CN"|"ko-KR"|undefined;
 
 export const i18n = createI18n({
   locale: "ja", // set locale
