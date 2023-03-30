@@ -49,13 +49,33 @@
           {{ t(localeKey.transcript.executeTitle) }}
         </p>
         <p v-for="d in data">
-          {{ d.datetime.toDateString() }} : {{ d.text }}
+          {{ d.datetime.toTimeString() }} : {{ d.text }}
         </p>
       </v-card-text>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn @click="transcriptStart(true)">開始</v-btn>
         <v-btn @click="transcriptStop()">終了</v-btn>
+      </v-card-actions>
+    </v-card>
+    <v-card class="mt-2">
+      <v-card-title>
+        読み上げ
+      </v-card-title>
+      <v-card-text>
+        <v-textarea
+          v-model="speakText"
+          name="synthesis"
+          variant="filled"
+          auto-grow
+          rows="2"
+          density="compact"
+          hide-details="auto"
+        ></v-textarea>
+      </v-card-text>
+      <v-card-actions>
         <v-spacer></v-spacer>
+        {{ speechSynthesisStore.status }}
         <v-select
           v-model="speechSynthesisStore.voice"
           :items="speechSynthesisStore.voices"
@@ -68,7 +88,8 @@
           hide-details="auto"
         >
         </v-select>
-        <v-btn @click="speakSample()">読み上げサンプル</v-btn>
+        <v-btn @click="speakSample()">{{ speechSynthesisStore.status === "play" ? "一時停止" : "再生" }}</v-btn>
+        <v-btn @click="speakCancel()" :disabled="speechSynthesisStore.status === 'stop'">停止</v-btn>
       </v-card-actions>
     </v-card>
     <v-card class="mt-2">
@@ -100,20 +121,20 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n'
 import { loadedLocales, localeKey } from "@/plugins/i18n";
 import { useSpeechRecognitionStore } from "@/store/speechRecognitionStore";
 import { useSpeechSynthesisStore } from "@/store/speechSynthesisStore";
-import DialogButton, { DialogButtonProps } from "@/components/DialogButton.vue"
+import DialogButton from "@/components/DialogButton.vue"
 const { locale, t } = useI18n();
-const data = reactive<TranscriptData[]>([]);
-
 type TranscriptData = {
   datetime: Date;
   text: string;
 };
-
+const data = reactive<TranscriptData[]>([]);
+const speakText = ref("音声読み上げサンプルです");
+const speakButtonText = ref("再生");
 const speechRecognitionStore = useSpeechRecognitionStore();
 const speechSynthesisStore = useSpeechSynthesisStore();
 
@@ -125,7 +146,6 @@ onMounted(async ()=>{
       datetime: dt,
       text: event.results[0][0].transcript,
     });
-    // data.push(`[${dt}]${event.results[0][0].transcript}`);
   });
 });
 
@@ -135,8 +155,23 @@ const transcriptStart = (recursive: boolean) => {
 const transcriptStop = () => {
   speechRecognitionStore.stop();
 }
+const _state = ref(speechSynthesisStore.status);
+speakButtonText.value = computed<string>(() => {
+  console.log(`speakButton.computed(${_state.value})`);
+  return _state.value == "play" ? "一時停止" : "再生";
+}).value;
+// const speakstatus = computed<string>(() => speechSynthesisStore.instance?.speaking? "speaking": "other").value;
 const speakSample = () => {
-  speechSynthesisStore.speak("読み上げサンプルです");
+  if(speechSynthesisStore.status == "play"){
+    speechSynthesisStore.pause();
+  } else if(speechSynthesisStore.status == "pause"){
+    speechSynthesisStore.resume();
+  } else{
+    speechSynthesisStore.speak(speakText.value);
+  }
+}
+const speakCancel = () => {
+  speechSynthesisStore.cancel();
 }
 </script>
 
