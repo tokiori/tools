@@ -18,17 +18,6 @@ export const useSpeechSynthesisStore = defineStore('useSpeechSynthesisStore', {
     voices: [],
     status: "stop",
   }),
-  // getters : {
-  //   status():"play"|"pause"|"stop" {
-  //     if(this.instance?.pending){
-  //       return "pause";
-  //     }else if(this.instance?.speaking){
-  //       return "play";
-  //     }else{
-  //       return "stop";
-  //     }
-  //   },
-  // },
   actions : {
     async init() {
       await this.getInstance();
@@ -68,7 +57,6 @@ export const useSpeechSynthesisStore = defineStore('useSpeechSynthesisStore', {
       if(!this.instance) {
         return;
       }
-      // this.observe();
       const utterThis = new SpeechSynthesisUtterance(text);
       const voice:SpeechSynthesisVoice|undefined = this.voices.find(v=>v.name===this.voice);
       if(voice){
