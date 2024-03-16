@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 type SpeechRecognitionStore = {
   lang: "ja-JP"|"en-US"|"en-GB"|"zh-CN"|"ko-KR"|undefined;
   instance: SpeechRecognition | undefined;
+  status: "rec"|undefined;
 }
 type SpeechRecognitionOptions = {
   continue?: boolean;
@@ -13,6 +14,7 @@ export const useSpeechRecognitionStore = defineStore('useSpeechRecognitionStore'
   state: (): SpeechRecognitionStore => ({
     lang: undefined,
     instance: undefined,
+    status:undefined,
   }),
   actions : {
     setup(callback:(event: SpeechRecognitionEvent)=>void) {
@@ -38,9 +40,14 @@ export const useSpeechRecognitionStore = defineStore('useSpeechRecognitionStore'
         return;
       }
       this.instance.start();
+      this.status = "rec";
       if(options && options.continue){
         this.instance.onend = () => {
           this.instance?.start();
+        }
+      }else{
+        this.instance.onend = () => {
+          this.status = undefined;
         }
       }
     },
@@ -50,6 +57,7 @@ export const useSpeechRecognitionStore = defineStore('useSpeechRecognitionStore'
       }
       this.instance.onend = null;
       this.instance.stop();
+      this.status = undefined;
     },
   },
 });

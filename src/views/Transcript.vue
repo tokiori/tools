@@ -54,6 +54,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <i :class="speechRecognitionStore.status === 'rec' ? 'mdi-mic' : 'mdi-mic-off'" class="mdi v-icon notranslate v-theme--light v-icon--size-default v-icon--clickable" role="button" aria-hidden="false" aria-label="Clear"></i>
         <v-btn @click="transcriptStart(true)">開始</v-btn>
         <v-btn @click="transcriptStop()">終了</v-btn>
       </v-card-actions>
@@ -75,7 +76,6 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        {{ speechSynthesisStore.status }}
         <v-select
           v-model="speechSynthesisStore.voice"
           :items="speechSynthesisStore.voices"
@@ -88,8 +88,10 @@
           hide-details="auto"
         >
         </v-select>
-        <v-btn @click="speakSample()">{{ speechSynthesisStore.status === "play" ? "一時停止" : "再生" }}</v-btn>
-        <v-btn @click="speakCancel()" :disabled="speechSynthesisStore.status === 'stop'">停止</v-btn>
+        <v-btn @click="speakSample()"><i :class="speechSynthesisStore.status === 'play' ? 'mdi-pause-circle' : 'mdi-play-circle'" class="mdi v-icon notranslate v-theme--light v-icon--size-default v-icon--clickable" role="button" aria-hidden="false" aria-label="Clear"></i></v-btn>
+        <v-btn @click="speakCancel()" :disabled="speechSynthesisStore.status === 'stop'"><i class="mdi-stop-circle mdi v-icon notranslate v-theme--light v-icon--size-default v-icon--clickable" role="button" aria-hidden="false" aria-label="Clear"></i></v-btn>
+        <!-- <v-btn @click="speakSample()">{{ speechSynthesisStore.status === "play" ? "一時停止" : "再生" }}</v-btn> -->
+        <!-- <v-btn @click="speakCancel()" :disabled="speechSynthesisStore.status === 'stop'">停止</v-btn> -->
       </v-card-actions>
     </v-card>
     <v-card class="mt-2">
